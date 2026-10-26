@@ -77,42 +77,59 @@ plastic_data_all %>% head(n = 10)
 
 ```{r Ex1, message = FALSE}
 # Write your code here to answer exercise 1
-count(plastic_data_all, region)
+count(plastic_data_all, region, sort = TRUE)
 
-# Africa has the most coastal countries/territories
+# Africa has the most coastal countries/territories.
 ```
-
-
 
 ### Ex 2.
 
 ```{r Ex2, message = FALSE}
 # Write your code here to answer exercise 2
-plastic_data_all %>%
-    select(mismanaged_plastic, population, code) %>%
-    mutate(total_mismanage_plastic = mismanaged_plastic * population) %>%
-    group_by(total_mismanage_plastic) %>%
-    summarise(code, total_mismanage_plastic)
+plastic_data_all <- plastic_data_all %>%
+    mutate(total_mismanage_plastic = mismanaged_plastic * population)
 
+plastic_data_all %>%
+    group_by(region) %>% 
+    summarise(mean_total = mean(total_mismanage_plastic)) %>% 
+    arrange(desc(mean_total))
+
+#Asia has the highest total mismanaged plastic, Oceania has the lowest.
 
 ```
-
 
 ### Ex 3.
 
 ```{r Ex3, message = FALSE}
 # Write your code here to answer exercise 3
+plastic_data_all <- plastic_data_all %>% 
+  mutate(pct_mismanaged_plastic_ocean = mismanaged_plastic_ocean / mismanaged_plastic)
 
+plastic_data_all %>% 
+  drop_na() %>% 
+  group_by(region) %>% 
+  summarise(median_pct = median(pct_mismanaged_plastic_ocean)) %>% 
+  arrange(median_pct)
 
+#Africa has the lowest median
 
 ```
-
 
 ### Ex 4.
 
 ```{r Ex4, message = FALSE}
 # Write your code here to answer exercise 4
-
-
+plastic_data_all <- plastic_data_all %>% 
+  rename(pop = population, m_plastic_oc = mismanaged_plastic_ocean, 
+         m_plastic = mismanaged_plastic, total_m_plastic = total_mismanage_plastic,
+         pct_m_plastic_oce = pct_mismanaged_plastic_ocean) %>% 
+  mutate(region = case_when(region == "Latin America and The Caribbean" ~ "LAC",
+                            TRUE ~ region))
+  
+plastic_data_all %>% 
+  mutate(totmplastic_byperson = total_m_plastic / pop) %>% 
+  group_by(region) %>% 
+  summarise(mean_mplast_byperson = mean(totmplastic_byperson)) %>% 
+  arrange(desc(mean_mplast_byperson))
 
 ```
